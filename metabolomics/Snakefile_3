@@ -1,0 +1,74 @@
+import os
+
+# Read config file
+configfile: "/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/config_3.yaml"
+
+# Define results directory and input paths based on ionization mode
+results_dir = config["results"]
+mode = config["mode"]
+
+if mode == "positive":
+    ionization_dir = os.path.join(results_dir, "positive")
+    filter_table = os.path.join(results_dir, config["filter_table_positive"])
+elif mode == "negative":
+    ionization_dir = os.path.join(results_dir, "negative")
+    filter_table = os.path.join(results_dir, config["filter_table_negative"])
+else:
+    raise ValueError(f"Unknown ionization mode: {mode}")
+
+# Ensure the directories exist
+os.makedirs(ionization_dir, exist_ok=True)
+
+# Define all output files
+rule all:
+    input:
+        expand(f"{ionization_dir}/pca_scree_0_.png"),
+        expand(f"{ionization_dir}/pca_biplot_0_.png"),
+        expand(f"{ionization_dir}/pca_loading_0_.png"),
+        expand(f"{ionization_dir}/pca_score2d_0_.png"),
+        expand(f"{ionization_dir}/pca_loading3d_0_.json"),
+        expand(f"{ionization_dir}/pls_pair_0_.png"),
+        expand(f"{ionization_dir}/pls_score2d_0_.png"),
+        expand(f"{ionization_dir}/pls_score3d_0_.png"),
+        expand(f"{ionization_dir}/pls_loading_0_.png"),
+        expand(f"{ionization_dir}/pls_loading3d_0_.json"),
+        expand(f"{ionization_dir}/pls_imp_0_.png"),
+        expand(f"{ionization_dir}/rf_cls_0_.png"),
+        expand(f"{ionization_dir}/rf_imp_0_.png"),
+        expand(f"{ionization_dir}/rf_outlier_0_.png"),
+        expand(f"{ionization_dir}/heatmap_1_.png"),
+        expand(f"{ionization_dir}/heatmap_2_.png"),
+        expand(f"{ionization_dir}/volcano_0_.png"),
+        expand(f"{ionization_dir}/fc_0_.png"),
+        expand(f"{ionization_dir}/tt_0_.png"),
+        expand(f"{ionization_dir}/snorm_0_.png"),
+        expand(f"{ionization_dir}/norm_0_.png")
+
+rule process_and_analyze:
+    input:
+        filter_table=filter_table
+    output:
+        pca_scree=f"{ionization_dir}/pca_scree_0_.png",
+        pca_biplot=f"{ionization_dir}/pca_biplot_0_.png",
+        pca_loading=f"{ionization_dir}/pca_loading_0_.png",
+        pca_score2d=f"{ionization_dir}/pca_score2d_0_.png",
+        pca_loading3d=f"{ionization_dir}/pca_loading3d_0_.json",
+        pls_pair=f"{ionization_dir}/pls_pair_0_.png",
+        pls_score2d=f"{ionization_dir}/pls_score2d_0_.png",
+        pls_score3d=f"{ionization_dir}/pls_score3d_0_.png",
+        pls_loading=f"{ionization_dir}/pls_loading_0_.png",
+        pls_loading3d=f"{ionization_dir}/pls_loading3d_0_.json",
+        pls_imp=f"{ionization_dir}/pls_imp_0_.png",
+        rf_cls=f"{ionization_dir}/rf_cls_0_.png",
+        rf_imp=f"{ionization_dir}/rf_imp_0_.png",
+        rf_outlier=f"{ionization_dir}/rf_outlier_0_.png",
+        heatmap_1=f"{ionization_dir}/heatmap_1_.png",
+        heatmap_2=f"{ionization_dir}/heatmap_2_.png",
+        volcano=f"{ionization_dir}/volcano_0_.png",
+        fc=f"{ionization_dir}/fc_0_.png",
+        tt=f"{ionization_dir}/tt_0_.png",
+        snorm=f"{ionization_dir}/snorm_0_.png",
+        norm=f"{ionization_dir}/norm_0_.png"
+    script:
+        "statistical_analysis.R"
+

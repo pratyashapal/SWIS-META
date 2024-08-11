@@ -1,0 +1,39 @@
+import os
+
+# Read config file
+configfile: "/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/config.yaml"
+
+# Define the output directory based on ionization mode
+mode = config["mode"]
+if mode == "positive":
+    ionization_dir = os.path.join(config["results"], "positive")
+elif mode == "negative":
+    ionization_dir = os.path.join(config["results"], "negative")
+else:
+    raise ValueError(f"Unknown ionization mode: {mode}")
+
+# Create directories if they do not exist
+if not os.path.exists(config["results"]):
+    os.makedirs(config["results"])
+
+if not os.path.exists(ionization_dir):
+    os.makedirs(ionization_dir)
+
+rule all:
+    input:
+        os.path.join(ionization_dir, "{output_prefix}.{output_format}".format(
+            output_prefix=config["output_prefix"],
+            output_format=config["output_format"]
+        ))
+
+rule run_metaboanalyst:
+    input:
+        csv=config["input_csv"]
+    output:
+        os.path.join(ionization_dir, "{output_prefix}.{output_format}".format(
+            output_prefix=config["output_prefix"],
+            output_format=config["output_format"]
+        ))
+    script:
+        "functional_analysis.R"
+

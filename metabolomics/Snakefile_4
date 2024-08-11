@@ -1,0 +1,25 @@
+import os
+
+# Read the configuration file
+configfile: "/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/config_4.yaml"
+
+# Define results directory
+results_dir = config["results"]
+
+rule all:
+    input:
+        expand(f"{results_dir}/filtered_combined.csv"),
+        expand(f"{results_dir}/filtered_combined_log.csv")
+
+rule process_combined_results:
+    input:
+        pos_ttest = config["pos_ttest"],
+        neg_ttest = config["neg_ttest"],
+        pos_volcano = config["pos_volcano"],
+        neg_volcano = config["neg_volcano"]
+    output:
+        filtered_combined = os.path.join(results_dir, "filtered_combined.csv"),
+        filtered_combined_log = os.path.join(results_dir, "filtered_combined_log.csv")
+    script:
+        "process_combined_results.R"
+

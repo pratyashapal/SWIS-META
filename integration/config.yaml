@@ -1,0 +1,3 @@
+metabolomics_results_dir: "compound_data_with_names.csv"
+transcriptomics_results_dir: "sig_genes_df.csv"
+results_dir: "results" 

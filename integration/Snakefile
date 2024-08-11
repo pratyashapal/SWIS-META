@@ -1,0 +1,38 @@
+# Define the configuration file
+CONFIGFILE = "config.yaml"
+
+# Read the configuration
+import yaml
+with open(CONFIGFILE, 'r') as f:
+    config = yaml.safe_load(f)
+
+# Paths from config
+compound_pathway_file = config['metabolomics_results_dir']
+gene_pathway_file = config['transcriptomics_results_dir']
+results_dir = config['results_dir']
+
+# Define the path for input files
+#compound_pathway_file = f"{metabolomics_results_dir}/compound_pathway_with_names.csv"
+#gene_pathway_file = f"{transcriptomics_results_dir}/sig_genes_df.csv"
+
+# Define the path for the R script
+r_script = "integrated_analysis.R"
+
+# Rule to run the R script
+rule run_analysis:
+    input:
+        r_script = r_script,
+        compound_pathway = compound_pathway_file,
+        gene_pathway = gene_pathway_file
+    output:
+        # Indicate output files that should be created by the R script
+        integrated_pathways_csv = f"{results_dir}/integrated_pathways.csv",
+        avg_log_fold_changes_pdf = f"{results_dir}/avg_log_fold_changes.pdf",
+        avg_gene_log_fold_changes_pdf = f"{results_dir}/avg_gene_log_fold_changes.pdf",
+        avg_compound_log_fold_changes_pdf = f"{results_dir}/avg_compound_log_fold_changes.pdf",
+        heatmap_log_fold_changes_pdf = f"{results_dir}/heatmap_log_fold_changes.pdf",
+        network_graph_pdf = f"{results_dir}/network_graph.pdf"
+    shell:
+        "Rscript {input.r_script}"
+
+

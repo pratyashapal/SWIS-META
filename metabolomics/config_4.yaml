@@ -1,0 +1,8 @@
+results: "/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/results"
+
+pos_ttest: "/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/results/positive/t_test.csv"
+pos_volcano: "/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/results/positive/volcano.csv"
+
+neg_ttest: "/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/results/negative/t_test.csv"
+neg_volcano: "/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/results/negative/volcano.csv"
+

@@ -1,0 +1,24 @@
+input_csv: "/users/2875659p/sharedscratch/rna_seq/metabolomics/files/pos_peaks.csv"
+ppm: 4.3
+mode: "positive"  # or "negative"
+include_internal_standards: "yes"
+retention_time_window: 0.02
+retention_time_unit: "seconds"
+filter_method: "none"
+filter_threshold: -1
+filter_by_fold_change: "F"
+top_percentage: 25
+filter_by_stat: "F"
+normalization_method: "LogNorm"
+ratio: false
+ratio_num: 20
+pval_cutoff: 0.05
+organism: "hsa_mfn"
+database_version: "current"
+num_permutations: 3
+random_seed: 100
+output_prefix: "peaks_to_paths_0"
+output_format: "png"
+output_dpi: 72
+results: "/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/results"
+

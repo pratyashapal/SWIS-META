@@ -1,0 +1,19 @@
+import os
+
+# Define the configuration file
+configfile: "config_4.yaml"
+
+# Define the directory for results
+results_dir = config["results_dir"]
+
+# Rule to execute the R script
+rule pathway_analysis:
+    input:
+        filtered_combined = os.path.join(results_dir, "filtered_combined.csv"),
+        filtered_combined_log = os.path.join(results_dir, "filtered_combined_log.csv")
+    output:
+        pathways_csv = os.path.join(results_dir, "compound_pathway_with_names.csv"),
+        plots = expand(os.path.join(results_dir, "plots/{plot}.pdf"), plot=["top_pathways", "top_20_pathways"])
+    script:
+        "pathway_analysis.R"
+

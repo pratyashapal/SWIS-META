@@ -1,0 +1,37 @@
+import os
+
+# Read config file
+configfile: "/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/config_2.yaml"
+
+# Define the output directory and CSV paths based on ionization mode
+mode = config["mode"]
+if mode == "positive":
+    ionization_dir = os.path.join(config["results"], "positive")
+    input_csv = os.path.join(config["results"], config["input_csv_positive"])
+    peaks_csv = os.path.join(config["results"], config["pos_peaks_csv"])
+elif mode == "negative":
+    ionization_dir = os.path.join(config["results"], "negative")
+    input_csv = os.path.join(config["results"], config["input_csv_negative"])
+    peaks_csv = os.path.join(config["results"], config["neg_peaks_csv"])
+else:
+    raise ValueError(f"Unknown ionization mode: {mode}")
+
+# Ensure the directories exist
+os.makedirs(ionization_dir, exist_ok=True)
+
+# Define the output file path
+output_filtered_csv = os.path.join(ionization_dir, f"{config['output_prefix']}.{config['output_format']}")
+
+rule all:
+    input:
+        output_filtered_csv
+
+rule process_and_merge:
+    input:
+        input_csv=input_csv,
+        peaks_csv=peaks_csv
+    output:
+        output_filtered_csv
+    script:
+        "filter.R"
+

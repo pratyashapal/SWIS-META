@@ -1,0 +1,73 @@
+import os
+
+configfile: "/users/2875659p/sharedscratch/rna_seq/transcriptomics/config.yaml"
+
+# Load configuration parameters
+raw_path = config["RAW_PATH"]
+adapters = config["ADAPTERS"]
+
+# Automatically define and create output directories
+out_path = "output_temp"
+final_path = "output_final"
+trimmomatic_dir = os.path.join(out_path, "trimmomatic")
+post_fastqc_dir = os.path.join(out_path, "postFASTQC")
+
+# Create directories if they don't exist
+os.makedirs(out_path, exist_ok=True)
+os.makedirs(final_path, exist_ok=True)
+os.makedirs(trimmomatic_dir, exist_ok=True)
+os.makedirs(post_fastqc_dir, exist_ok=True)
+
+# Ensure trimming is enabled
+trim = config["TRIM"]
+if trim != "yes":
+    raise ValueError("Trimming is not enabled. Set 'TRIM: yes' in the configuration file to run this workflow.")
+
+# List of samples based on raw data filenames
+samples = [os.path.basename(f).split('_R1_001.fastq.gz')[0] for f in os.listdir(raw_path) if f.endswith('_R1_001.fastq.gz')]
+
+rule all:
+    input:
+        expand(os.path.join(post_fastqc_dir, "{sample}_R1_001_paired_fastqc.html"), sample=samples),
+        expand(os.path.join(post_fastqc_dir, "{sample}_R2_001_paired_fastqc.html"), sample=samples),
+        os.path.join(final_path, "multiqc_report_postFASTQC.html")
+
+rule trimmomatic:
+    input:
+        r1 = os.path.join(raw_path, "{sample}_R1_001.fastq.gz"),
+        r2 = os.path.join(raw_path, "{sample}_R2_001.fastq.gz")
+    output:
+        paired_r1 = os.path.join(trimmomatic_dir, "{sample}_R1_001_paired.fastq.gz"),
+        unpaired_r1 = os.path.join(trimmomatic_dir, "{sample}_R1_001_unpaired.fastq.gz"),
+        paired_r2 = os.path.join(trimmomatic_dir, "{sample}_R2_001_paired.fastq.gz"),
+        unpaired_r2 = os.path.join(trimmomatic_dir, "{sample}_R2_001_unpaired.fastq.gz")
+    shell:
+        """
+        trimmomatic PE -phred33 {input.r1} {input.r2} \
+            {output.paired_r1} {output.unpaired_r1} \
+            {output.paired_r2} {output.unpaired_r2} \
+            ILLUMINACLIP:{adapters}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+        """
+
+rule fastqc_post_trim:
+    input:
+        paired_r1 = os.path.join(trimmomatic_dir, "{sample}_R1_001_paired.fastq.gz"),
+        paired_r2 = os.path.join(trimmomatic_dir, "{sample}_R2_001_paired.fastq.gz")
+    output:
+        paired_r1_fastqc = os.path.join(post_fastqc_dir, "{sample}_R1_001_paired_fastqc.html"),
+        paired_r2_fastqc = os.path.join(post_fastqc_dir, "{sample}_R2_001_paired_fastqc.html")
+    shell:
+        """
+        fastqc -o {post_fastqc_dir} {input.paired_r1} {input.paired_r2}
+        """
+
+rule multiqc_post:
+    input:
+        expand(os.path.join(post_fastqc_dir, "{sample}_R1_001_paired_fastqc.html"), sample=samples),
+        expand(os.path.join(post_fastqc_dir, "{sample}_R2_001_paired_fastqc.html"), sample=samples)
+    output:
+        report = os.path.join(final_path, "multiqc_report_postFASTQC.html")
+    shell:
+        """
+        multiqc {post_fastqc_dir} -o {final_path} --filename {output.report}
+        """

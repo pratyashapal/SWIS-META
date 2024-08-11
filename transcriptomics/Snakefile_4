@@ -1,0 +1,73 @@
+# Snakefile
+
+import yaml
+import os
+
+# Load the configuration file
+with open("config_main.yaml") as f:
+    config = yaml.safe_load(f)
+
+# Define paths based on config
+results_dir = config["results_dir"]
+count_matrix_file = config["count_matrix_file"]
+
+# Define the output files
+volcano_plot_file = os.path.join(results_dir, "volcano_plot.pdf")
+pca_plot_file = os.path.join(results_dir, "pca_plot.pdf")
+pca_labels_plot_file = os.path.join(results_dir, "pca_labels_plot.pdf")
+sample_correlation_heatmap_file = os.path.join(results_dir, "sample_correlation_heatmap.pdf")
+significant_genes_heatmap_file = os.path.join(results_dir, "significant_genes_heatmap.pdf")
+top25_heatmap_file = os.path.join(results_dir, "top25_heatmap.pdf")
+kegg_enrichment_csv_file = os.path.join(results_dir, "kegg_enrichment.csv")
+kegg_enrichment_gene_names_csv_file = os.path.join(results_dir, "kegg_pathway_enrichment_gene_names.csv")
+sig_genes_csv_file = os.path.join(results_dir, "sig_genes_df.csv")
+gsea_upregulated_top10_file = os.path.join(results_dir, "gsea_upregulated_top10.pdf")
+gsea_downregulated_top10_file = os.path.join(results_dir, "gsea_downregulated_top10.pdf")
+kegg_upregulated_top10_file = os.path.join(results_dir, "kegg_upregulated_top10.pdf")
+kegg_downregulated_top10_file = os.path.join(results_dir, "kegg_downregulated_top10.pdf")
+metabolism_upregulated_top10_file = os.path.join(results_dir, "metabolism_upregulated_top10.pdf")
+metabolism_downregulated_top10_file = os.path.join(results_dir, "metabolism_downregulated_top10.pdf")
+
+# Define the final rule
+rule all:
+    input:
+        volcano_plot_file,
+        pca_plot_file,
+        pca_labels_plot_file,
+        sample_correlation_heatmap_file,
+        significant_genes_heatmap_file,
+        top25_heatmap_file,
+        kegg_enrichment_csv_file,
+        kegg_enrichment_gene_names_csv_file,
+        sig_genes_csv_file,
+        gsea_upregulated_top10_file,
+        gsea_downregulated_top10_file,
+        kegg_upregulated_top10_file,
+        kegg_downregulated_top10_file,
+        metabolism_upregulated_top10_file,
+        metabolism_downregulated_top10_file
+
+# Rule to run the R script
+rule run_analysis:
+    input:
+        count_matrix=count_matrix_file,
+        config="config_main.yaml"
+    output:
+        volcano_plot=volcano_plot_file,
+        pca_plot=pca_plot_file,
+        pca_labels_plot=pca_labels_plot_file,
+        sample_correlation_heatmap=sample_correlation_heatmap_file,
+        significant_genes_heatmap=significant_genes_heatmap_file,
+        top25_heatmap=top25_heatmap_file,
+        kegg_enrichment_csv=kegg_enrichment_csv_file,
+        kegg_enrichment_gene_names_csv=kegg_enrichment_gene_names_csv_file,
+        sig_genes_csv=sig_genes_csv_file,
+        gsea_upregulated_top10=gsea_upregulated_top10_file,
+        gsea_downregulated_top10=gsea_downregulated_top10_file,
+        kegg_upregulated_top10=kegg_upregulated_top10_file,
+        kegg_downregulated_top10=kegg_downregulated_top10_file,
+        metabolism_upregulated_top10=metabolism_upregulated_top10_file,
+        metabolism_downregulated_top10=metabolism_downregulated_top10_file
+    script:
+        "analyze_expression.R"
+

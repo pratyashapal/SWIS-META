@@ -1,0 +1,20 @@
+input_dirs:
+  bm_pos: "data/bm_pos"
+  bm_neg: "data/bm_neg"
+  brain_pos: "data/brain_pos"
+  brain_neg: "data/brain_neg"
+  qc_pos: "data/qc_pos"
+  qc_neg: "data/qc_neg"
+
+roi_params:
+  rt_idx: 0.9
+  rm_conts: true
+
+annotation_params:
+  polarity: "positive"
+  mz_abs_add: 0.015
+
+optimization_params:
+  method: "DoE"
+  ncore: 1
+

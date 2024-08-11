@@ -1,0 +1,114 @@
+import os
+
+# Load configuration parameters
+configfile: "/users/2875659p/sharedscratch/rna_seq/transcriptomics/config.yaml"
+
+# Define paths
+out_path = "output_temp"
+final_path = "output_final"
+index_path = "index"  # Unified index directory
+gtf_file = config["GTF_FILE"]
+host_db = config["HOST_DB"]
+graft_db = config["GRAFT_DB"]
+trim = config["TRIM"]
+xeno_filter = config["XENO_FILTER"]
+
+# Create necessary directories
+os.makedirs(out_path, exist_ok=True)
+os.makedirs(final_path, exist_ok=True)
+os.makedirs(index_path, exist_ok=True)
+
+# Define input paths
+raw_path = config["RAW_PATH"]
+trim_path = config["TRIM_PATH"]
+
+# List of sample names
+samples = [os.path.basename(f).split('_R1_001.fastq.gz')[0] for f in os.listdir(raw_path) if f.endswith('_R1_001.fastq.gz')]
+
+rule all:
+    input:
+        expand(os.path.join(out_path, "counts", "{sample}_counts.txt"), sample=samples),
+        os.path.join(final_path, "gene_symbol_counts_matrix.csv")
+
+# Rule to build Xengsort index
+if xeno_filter == "yes":
+    rule build_index:
+        output:
+            index = directory(os.path.join(index_path, "xengsort_index"))
+        run:
+            if not os.path.exists(os.path.join(output.index, "xengsort_index")):
+                shell("""
+                    xengsort index --index {output.index} -H {host_db} -G {graft_db} -n 4_500_000_000 -k 25
+                """)
+
+    rule classify_reads:
+        input:
+            index = rules.build_index.output.index,
+            r1 = lambda wildcards: os.path.join(trim_path if trim == "yes" else raw_path, f"{wildcards.sample}_R1_001_paired.fastq.gz" if trim == "yes" else f"{wildcards.sample}_R1_001.fastq.gz"),
+            r2 = lambda wildcards: os.path.join(trim_path if trim == "yes" else raw_path, f"{wildcards.sample}_R2_001_paired.fastq.gz" if trim == "yes" else f"{wildcards.sample}_R2_001.fastq.gz")
+        output:
+            graft_r1 = os.path.join(out_path, "xeno_filtered", "{sample}_graft.1.fq.gz"),
+            graft_r2 = os.path.join(out_path, "xeno_filtered", "{sample}_graft.2.fq.gz"),
+            ambiguous_r1 = os.path.join(out_path, "xeno_filtered", "{sample}_ambiguous.1.fq.gz"),
+            ambiguous_r2 = os.path.join(out_path, "xeno_filtered", "{sample}_ambiguous.2.fq.gz"),
+            host_r1 = os.path.join(out_path, "xeno_filtered", "{sample}_host.1.fq.gz"),
+            host_r2 = os.path.join(out_path, "xeno_filtered", "{sample}_host.2.fq.gz"),
+            both_r1 = os.path.join(out_path, "xeno_filtered", "{sample}_both.1.fq.gz"),
+            both_r2 = os.path.join(out_path, "xeno_filtered", "{sample}_both.2.fq.gz"),
+            neither_r1 = os.path.join(out_path, "xeno_filtered", "{sample}_neither.1.fq.gz"),
+            neither_r2 = os.path.join(out_path, "xeno_filtered", "{sample}_neither.2.fq.gz")
+        run:
+            if not all([os.path.exists(f) for f in output]):
+                shell("""
+                    xengsort classify --index {input.index} --fastq {input.r1} --pairs {input.r2} --prefix {os.path.join(out_path, 'xeno_filtered', wildcards.sample)} --mode xengsort
+                """)
+
+# Rule to build HISAT2 index
+rule hisat2_index:
+    output:
+        expand(os.path.join(index_path, "GRCh38.{ext}"), ext=["1.ht2", "2.ht2", "3.ht2", "4.ht2", "5.ht2", "6.ht2", "7.ht2", "8.ht2"])
+    run:
+        if not all([os.path.exists(f) for f in output]):
+            shell("""
+                hisat2-build {graft_db} {os.path.join(index_path, 'GRCh38')}
+            """)
+
+# Rule to align reads
+rule align_reads:
+    input:
+        index_files = rules.hisat2_index.output,
+        r1 = lambda wildcards: os.path.join(out_path if xeno_filter == "yes" else (trim_path if trim == "yes" else raw_path), f"{wildcards.sample}_graft.1.fq.gz" if xeno_filter == "yes" else f"{wildcards.sample}_R1_001_paired.fastq.gz" if trim == "yes" else f"{wildcards.sample}_R1_001.fastq.gz"),
+        r2 = lambda wildcards: os.path.join(out_path if xeno_filter == "yes" else (trim_path if trim == "yes" else raw_path), f"{wildcards.sample}_graft.2.fq.gz" if xeno_filter == "yes" else f"{wildcards.sample}_R2_001_paired.fastq.gz" if trim == "yes" else f"{wildcards.sample}_R2_001.fastq.gz")
+    output:
+        bam = os.path.join(out_path, "bam_files", "{sample}_sorted.bam")
+    run:
+        if not os.path.exists(output.bam):
+            shell("""
+                hisat2 -p 8 -x {os.path.join(index_path, 'GRCh38')} -1 {input.r1} -2 {input.r2} -S {os.path.join(out_path, 'bam_files', wildcards.sample)}.sam
+                samtools view -bS {os.path.join(out_path, 'bam_files', wildcards.sample)}.sam > {os.path.join(out_path, 'bam_files', wildcards.sample)}.bam
+                samtools sort {os.path.join(out_path, 'bam_files', wildcards.sample)}.bam -o {output.bam}
+                samtools index {output.bam}
+            """)
+
+# Rule to count reads
+rule count_reads:
+    input:
+        bam = rules.align_reads.output.bam
+    output:
+        counts = os.path.join(out_path, "counts", "{sample}_counts.txt")
+    run:
+        if not os.path.exists(output.counts):
+            shell("""
+                featureCounts -a {gtf_file} -o {output.counts} -t exon -g gene_id -s 2 -p -B -C {input.bam}
+            """)
+
+# Rule to create the gene symbol counts matrix
+rule count_matrix:
+    input:
+        expand(os.path.join(out_path, "counts", "{sample}_counts.txt"), sample=samples)
+    output:
+        os.path.join(final_path, "gene_symbol_counts_matrix.csv")
+    params:
+        config="config.yaml"
+    script:
+        "matrix_script.R"

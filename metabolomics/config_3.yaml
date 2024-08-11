@@ -1,0 +1,6 @@
+filter_table_positive: "results/positive/filter_table.csv"
+filter_table_negative: "results/negative/filter_table.csv"
+
+results: "/users/2875659p/sharedscratch/rna_seq/metabolomics/results"
+
+mode: "positive"  

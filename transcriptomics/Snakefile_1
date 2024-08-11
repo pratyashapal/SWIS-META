@@ -1,0 +1,52 @@
+import os
+
+# Specify the path for configuration file
+configfile: "/users/2875659p/sharedscratch/rna_seq/transcriptomics/config.yaml"
+
+# Load configuration parameters
+raw_path = config["RAW_PATH"]
+
+# Automatically define and create output directories
+out_path = "output"
+final_path = "output_final"
+
+# Create directories if they don't exist
+os.makedirs(out_path, exist_ok=True)
+os.makedirs(final_path, exist_ok=True)
+
+# Define subdirectory for pre-FastQC results
+pre_fastqc_dir = os.path.join(out_path, "preFASTQC")
+os.makedirs(pre_fastqc_dir, exist_ok=True)
+
+# List of samples based on raw data filenames
+samples = [os.path.basename(f).split('_R1_001.fastq.gz')[0] for f in os.listdir(raw_path) if f.endswith('_R1_001.fastq.gz')]
+
+rule all:
+    input:
+        expand(os.path.join(pre_fastqc_dir, "{sample}_R1_001_fastqc.html"), sample=samples),
+        expand(os.path.join(pre_fastqc_dir, "{sample}_R2_001_fastqc.html"), sample=samples),
+        os.path.join(final_path, "multiqc_report_preFASTQC.html")
+
+rule fastqc_pre_trim:
+    input:
+        r1 = os.path.join(raw_path, "{sample}_R1_001.fastq.gz"),
+        r2 = os.path.join(raw_path, "{sample}_R2_001.fastq.gz")
+    output:
+        r1_fastqc = os.path.join(pre_fastqc_dir, "{sample}_R1_001_fastqc.html"),
+        r2_fastqc = os.path.join(pre_fastqc_dir, "{sample}_R2_001_fastqc.html")
+    shell:
+        """
+        fastqc -o {pre_fastqc_dir} {input.r1} {input.r2}
+        """
+
+rule multiqc_pre:
+    input:
+        expand(os.path.join(pre_fastqc_dir, "{sample}_R1_001_fastqc.html"), sample=samples),
+        expand(os.path.join(pre_fastqc_dir, "{sample}_R2_001_fastqc.html"), sample=samples)
+    output:
+        report = os.path.join(final_path, "multiqc_report_preFASTQC.html")
+    shell:
+        """
+        multiqc {pre_fastqc_dir} -o {final_path} --filename {output.report}
+        """
+

@@ -1,0 +1,10 @@
+input_csv_positive: "results/positive/mummichog_matched_compound_all.csv"
+input_csv_negative: "results/negative/mummichog_matched_compound_all.csv"
+pos_peaks_csv: "results/positive/pos_peaks.csv"
+neg_peaks_csv: "results/negative/neg_peaks.csv"
+column_index: 2
+output_prefix: "filter_table"
+output_format: "csv"
+results: "/users/2875659p/sharedscratch/rna_seq/metabolomics/results"
+mode: "positive" 
+
