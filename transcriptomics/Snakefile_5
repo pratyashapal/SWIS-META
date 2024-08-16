@@ -1,0 +1,35 @@
+# Define the configuration file
+configfile: "config.yaml"
+
+# Define the rule to run the R script
+rule all:
+    input:
+        expand("{output_dir}/pca_plot.pdf", output_dir=config["output_dir"]),
+        expand("{output_dir}/sig_genes.csv", output_dir=config["output_dir"]),
+        expand("{output_dir}/correlation_matrix.pdf", output_dir=config["output_dir"]),
+        expand("{output_dir}/heatmap_top25_genes.pdf", output_dir=config["output_dir"]),
+        expand("{output_dir}/volcano_plot.pdf", output_dir=config["output_dir"]),
+        expand("{output_dir}/kegg_results_differentially_expressed_genes.csv", output_dir=config["output_dir"]),
+        expand("{output_dir}/top_kegg_pathways_differentially_expressed_genes.csv", output_dir=config["output_dir"]),
+        expand("{output_dir}/top_metabolism_kegg_differentially_expressed_genes.csv", output_dir=config["output_dir"]),
+        expand("{output_dir}/kegg_pathways_differentially_expressed_genes.pdf", output_dir=config["output_dir"]),
+        expand("{output_dir}/kegg_metabolism_differentially_expressed_genes.pdf", output_dir=config["output_dir"])
+
+rule run_r_script:
+    input:
+        count_matrix = config["count_matrix_path"],
+        metadata = config["metadata_path"]
+    output:
+        pca_plot = "{output_dir}/pca_plot.pdf",
+        sig_genes = "{output_dir}/sig_genes.csv",
+        correlation_matrix = "{output_dir}/correlation_matrix.pdf",
+        heatmap_top25_genes = "{output_dir}/heatmap_top25_genes.pdf",
+        volcano_plot = "{output_dir}/volcano_plot.pdf",
+        kegg_results = "{output_dir}/kegg_results_differentially_expressed_genes.csv",
+        top_kegg_pathways = "{output_dir}/top_kegg_pathways_differentially_expressed_genes.csv",
+        top_metabolism_kegg = "{output_dir}/top_metabolism_kegg_differentially_expressed_genes.csv",
+        kegg_pathways_pdf = "{output_dir}/kegg_pathways_differentially_expressed_genes.pdf",
+        kegg_metabolism_pdf = "{output_dir}/kegg_metabolism_differentially_expressed_genes.pdf"
+    script:
+        "de_analysis.R"
+

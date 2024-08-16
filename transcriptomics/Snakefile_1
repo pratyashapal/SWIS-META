@@ -1,7 +1,7 @@
 import os
 
 # Specify the path for configuration file
-configfile: "/users/2875659p/sharedscratch/rna_seq/transcriptomics/config.yaml"
+configfile: "/SWIS-META/transcriptomics/config.yaml"
 
 # Load configuration parameters
 raw_path = config["RAW_PATH"]

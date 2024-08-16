@@ -4,7 +4,7 @@ library(org.Hs.eg.db)
 library(AnnotationDbi)
 
 # Load configuration from the YAML file
-config <- yaml::read_yaml("/users/2875659p/sharedscratch/rna_seq/transcriptomics/config.yaml")
+config <- yaml::read_yaml("/SWIS-META/transcriptomics/config.yaml")
 count_dir <- config$COUNT_DIR
 out_final <- config$OUT_FINAL
 
