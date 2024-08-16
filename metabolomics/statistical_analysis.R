@@ -6,7 +6,12 @@ library(MetaboAnalystR)
 library(yaml)
 
 # Configuration
-config <- yaml::read_yaml("/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/config_3.yaml")
+config <- yaml::read_yaml("/SWIS-META/metabolomics/config_main.yaml")
+
+output_dir <- file.path(config$results, config$mode)
+setwd(output_dir)
+
+
 results_dir <- config$results
 
 # Define input and output paths based on ionization mode

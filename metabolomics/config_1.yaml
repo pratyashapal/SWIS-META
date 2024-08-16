@@ -1,4 +1,5 @@
-input_csv: "/users/2875659p/sharedscratch/rna_seq/metabolomics/files/pos_peaks.csv"
+# Snakefile_1 parameters
+input_csv: "/path/to/peak_file.csv"
 ppm: 4.3
 mode: "positive"  # or "negative"
 include_internal_standards: "yes"
@@ -20,5 +21,4 @@ random_seed: 100
 output_prefix: "peaks_to_paths_0"
 output_format: "png"
 output_dpi: 72
-results: "/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/results"
-
+results: "/SWIS-META/metabolomics/results"

@@ -1,7 +1,7 @@
 import os
 
 # Read config file
-configfile: "/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/config_3.yaml"
+configfile: "/SWIS-META/metabolomics/config_main.yaml"
 
 # Define results directory and input paths based on ionization mode
 results_dir = config["results"]

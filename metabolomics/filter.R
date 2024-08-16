@@ -3,21 +3,27 @@ library(dplyr)
 library(yaml)
 
 # Load parameters from config file
-config <- yaml::read_yaml("/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/config_2.yaml")
+config <- yaml::read_yaml("/SWIS-META/metabolomics/config_2.yaml")
+
+# Determine the output directory based on ionization mode
+output_dir <- file.path(config$results, config$mode)
+
+# Set the working directory to the output directory
+setwd(output_dir)
 
 # Read the input files
 if (config$mode == "positive") {
-  input_csv <- config$input_csv_positive
-  peaks_csv <- config$pos_peaks_csv
+  input_csv <- file.path(config$input_csv_positive)
+  peaks_csv <- file.path(config$pos_peaks_csv)
 } else if (config$mode == "negative") {
-  input_csv <- config$input_csv_negative
-  peaks_csv <- config$neg_peaks_csv
+  input_csv <- file.path(config$input_csv_negative)
+  peaks_csv <- file.path(config$neg_peaks_csv)
 } else {
   stop("Unknown ionization mode specified.")
 }
 
-data <- read.csv(file.path(config$results, input_csv), header = TRUE)
-peak_table <- read.csv(file.path(config$results, peaks_csv))
+data <- read.csv(input_csv, header = TRUE)
+peak_table <- read.csv(peaks_csv)
 
 # Define a function to get the compound name for a given KEGG ID
 get_compound_name <- function(kegg_id) {
@@ -66,6 +72,7 @@ merged_table <- data %>%
 # Select specific columns
 selected_columns <- merged_table[, c(7, 9:16)]
 
-# Write the filtered table to a CSV file
-write.csv(selected_columns, file.path(config$results, config$output_filtered_csv), row.names = FALSE)
+# Write the filtered table to a CSV file in the output directory
+output_file <- file.path(output_dir, paste0(config$output_prefix, ".csv"))
+write.csv(selected_columns, output_file, row.names = FALSE)
 

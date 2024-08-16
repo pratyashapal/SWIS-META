@@ -19,8 +19,8 @@ library(tidyr)
 library(yaml)
 
 # Read config file
-config <- yaml::read_yaml("config_4.yaml")
-results_dir <- config$results_dir
+config <- yaml::read_yaml("/SWIS-META/metabolomics/config_main.yaml")
+results_dir <- config$results
 
 # Define file paths
 filtered_combined_path <- file.path(results_dir, "filtered_combined.csv")

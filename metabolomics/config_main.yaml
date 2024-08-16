@@ -1,0 +1,23 @@
+# Snakefile_2 parameters
+input_csv_positive: "/SWIS-META/metabolomics/results/positive/mummichog_matched_compound_all.csv"
+input_csv_negative: "/SWIS-META/metabolomics/results/negative/mummichog_matched_compound_all.csv"
+pos_peaks_csv: "path/to/positive_peaks.csv"
+neg_peaks_csv: "/path/to/negative_peaks.csv"
+column_index: 2
+output_prefix: "filter_table"
+output_format: "csv"
+
+# Snakefile_3 parameters
+filter_table_positive: "/SWIS-META/metabolomics/results/positive/filter_table.csv"
+filter_table_negative: "/SWIS-META/metabolomics/results/negative/filter_table.csv"
+
+# Snakefile_4 parameters
+pos_ttest: "/SWIS-META/metabolomics/results/positive/t_test.csv"
+pos_volcano: "/SWIS-META/metabolomics/results/positive/volcano.csv"
+
+neg_ttest: "/SWIS-META/metabolomics/results/negative/t_test.csv"
+neg_volcano: "/SWIS-META/metabolomics/results/negative/volcano.csv"
+
+# Common parameters
+results: "/SWIS-META/metabolomics/results"
+mode: "positive"  # or "negative"

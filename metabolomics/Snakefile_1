@@ -1,7 +1,7 @@
 import os
 
 # Read config file
-configfile: "/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/config.yaml"
+configfile: "/SWIS-META/metabolomics/config_1.yaml"
 
 # Define the output directory based on ionization mode
 mode = config["mode"]

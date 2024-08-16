@@ -1,7 +1,7 @@
 import os
 
 # Read the configuration file
-configfile: "/users/2875659p/sharedscratch/rna_seq/metabolomics/meta/config_4.yaml"
+configfile: "/SWIS-META/metabolomics/config_main.yaml"
 
 # Define results directory
 results_dir = config["results"]

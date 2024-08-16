@@ -1,0 +1,23 @@
+#!/bin/bash -l
+
+############# SLURM SETTINGS #############
+
+#SBATCH --account=none
+#SBATCH --job-name=snake_2
+#SBATCH --partition=nodes
+#SBATCH --time=0-12:00:00
+#SBATCH --mem=64G
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --ntasks-per-node=1
+#SBATCH --mail-user="provide mail id"
+#SBATCH --mail-type=END
+#SBATCH --mail-type=FAIL
+
+###############################################
+# load modules
+# module load /path/to/R
+# Run snakemake with required Snakefile(pre, 1-5)
+snakemake -s Snakefile_ --cores $SLURM_CPUS_PER_TASK --use-conda
+

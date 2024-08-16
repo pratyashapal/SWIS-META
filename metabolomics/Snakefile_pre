@@ -1,0 +1,38 @@
+import os
+import glob
+
+def gather_files(directory):
+    return glob.glob(os.path.join(directory, "*.mzML"))
+
+configfile: "config_pre.yaml"
+
+rule all:
+    input:
+        "results/annotated_peaklist_negative_raw.csv",
+        "results/annotated_peaklist_positive_raw.csv",
+        "results/metaboanalyst_input_negative_raw.csv",
+        "results/metaboanalyst_input_positive_raw.csv"
+
+rule run_analysis:
+    input:
+        bm_pos=gather_files(config["input_dirs"]["bm_pos"]),
+        bm_neg=gather_files(config["input_dirs"]["bm_neg"]),
+        brain_pos=gather_files(config["input_dirs"]["brain_pos"]),
+        brain_neg=gather_files(config["input_dirs"]["brain_neg"]),
+        qc_pos=gather_files(config["input_dirs"]["qc_pos"]),
+        qc_neg=gather_files(config["input_dirs"]["qc_neg"])
+    output:
+        annotated_peaklist_negative="results/annotated_peaklist_negative_raw.csv",
+        annotated_peaklist_positive="results/annotated_peaklist_positive_raw.csv",
+        metaboanalyst_input_negative="results/metaboanalyst_input_negative_raw.csv",
+        metaboanalyst_input_positive="results/metaboanalyst_input_positive_raw.csv"
+    params:
+        rt_idx=config["roi_params"]["rt_idx"],
+        rm_conts=config["roi_params"]["rm_conts"],
+        polarity=config["annotation_params"]["polarity"],
+        mz_abs_add=config["annotation_params"]["mz_abs_add"],
+        method=config["optimization_params"]["method"],
+        ncore=config["optimization_params"]["ncore"]
+    script:
+        "pre_analysis.R"
+

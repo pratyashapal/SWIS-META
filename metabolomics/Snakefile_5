@@ -1,10 +1,10 @@
 import os
 
 # Define the configuration file
-configfile: "config_4.yaml"
+configfile: "/SWIS-META/metabolomics/config_main.yaml"
 
 # Define the directory for results
-results_dir = config["results_dir"]
+results_dir = config["results"]
 
 # Rule to execute the R script
 rule pathway_analysis:
