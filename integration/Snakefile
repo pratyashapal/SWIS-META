@@ -11,9 +11,6 @@ compound_pathway_file = config['metabolomics_results_dir']
 gene_pathway_file = config['transcriptomics_results_dir']
 results_dir = config['results_dir']
 
-# Define the path for input files
-#compound_pathway_file = f"{metabolomics_results_dir}/compound_pathway_with_names.csv"
-#gene_pathway_file = f"{transcriptomics_results_dir}/sig_genes_df.csv"
 
 # Define the path for the R script
 r_script = "integrated_analysis.R"
@@ -32,6 +29,8 @@ rule run_analysis:
         avg_compound_log_fold_changes_pdf = f"{results_dir}/avg_compound_log_fold_changes.pdf",
         heatmap_log_fold_changes_pdf = f"{results_dir}/heatmap_log_fold_changes.pdf",
         network_graph_pdf = f"{results_dir}/network_graph.pdf"
+        upregulated_pathways_log_fold_changes_pdf = f"{results_dir}/upregulated_pathways_log_fold_changes.pdf"
+        downregulated_pathways_log_fold_changes_pdf = f"{results_dir}/downregulated_pathways_log_fold_changes.pdf"
     shell:
         "Rscript {input.r_script}"
 

@@ -165,3 +165,92 @@ p5 <- ggraph(network, layout = "fr") +
 
 ggsave(file.path(results_dir, "network_graph.pdf"), plot = p5, device = "pdf", width = 20, height = 15)
 
+
+# Separate analysis for upregulated and downregulated genes and compounds
+upregulated_genes <- gene_data_with_pathways %>% filter(LogFoldChange > 1)
+downregulated_genes <- gene_data_with_pathways %>% filter(LogFoldChange < -1)
+upregulated_compounds <- compound_data_with_names %>% filter(LogFoldChange > 1)
+downregulated_compounds <- compound_data_with_names %>% filter(LogFoldChange < -1)
+
+# Combined analysis for upregulated genes and compounds
+combined_upregulated <- inner_join(upregulated_genes, upregulated_compounds, by = "PathwayName")
+combined_upregulated_pathways <- combined_upregulated %>% 
+  group_by(PathwayName) %>% 
+  summarise(genes = paste(GeneSymbol, collapse = ", "),
+            compounds = paste(CompoundName, collapse = ", "),
+            avg_gene_lfc = mean(LogFoldChange.x),
+            avg_compound_lfc = mean(LogFoldChange.y))
+
+# Combined analysis for downregulated genes and compounds
+combined_downregulated <- inner_join(downregulated_genes, downregulated_compounds, by = "PathwayName")
+combined_downregulated_pathways <- combined_downregulated %>% 
+  group_by(PathwayName) %>% 
+  summarise(genes = paste(GeneSymbol, collapse = ", "),
+            compounds = paste(CompoundName, collapse = ", "),
+            avg_gene_lfc = mean(LogFoldChange.x),
+            avg_compound_lfc = mean(LogFoldChange.y))
+
+# Combine the data for gene and compound log fold changes into a single data frame
+combined_upregulated_pathways_long <- combined_upregulated_pathways %>%
+  pivot_longer(cols = c(avg_gene_lfc, avg_compound_lfc), 
+               names_to = "Type", 
+               values_to = "Log_Fold_Change")
+
+# Create the faceted bar plot for upregulated pathways
+p6 <- ggplot(combined_upregulated_pathways_long, aes(x = reorder(PathwayName, Log_Fold_Change), y = Log_Fold_Change, fill = Type)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
+  coord_flip() +
+  labs(title = "Average Upregulated Log Fold Changes per Pathway",
+       x = "Pathway", 
+       y = "Average Log Fold Change",
+       fill = "Type") +
+  scale_fill_manual(values = c("avg_gene_lfc" = "steelblue", "avg_compound_lfc" = "darkorange"),
+                    labels = c("Gene Log Fold Change", "Compound Log Fold Change")) +
+  theme_minimal() +
+  theme(
+    text = element_text(size = 12),  # Adjust text size
+    axis.text.x = element_text(angle = 0, vjust = 0.5),  # Align x-axis text
+    axis.text.y = element_text(size = 10),  # Adjust y-axis text size
+    axis.title = element_text(size = 14, face = "bold"),  # Bold axis titles
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Center and bold plot title
+    legend.title = element_text(size = 12),  # Adjust legend title size
+    legend.text = element_text(size = 10),  # Adjust legend text size
+    panel.grid.major = element_line(color = "gray90"),  # Light grid lines
+    panel.grid.minor = element_blank()  # Remove minor grid lines
+  )
+
+# Save the plot
+ggsave(file.path(results_dir, "upregulated_pathways_log_fold_changes.pdf"), plot = p6, device = "pdf", width = 10, height = 8)
+
+# Combine the data for gene and compound log fold changes into a single data frame
+combined_downregulated_pathways_long <- combined_downregulated_pathways %>%
+  pivot_longer(cols = c(avg_gene_lfc, avg_compound_lfc), 
+               names_to = "Type", 
+               values_to = "Log_Fold_Change")
+
+# Create the faceted bar plot for downregulated pathways
+p7 <- ggplot(combined_downregulated_pathways_long, aes(x = reorder(PathwayName, Log_Fold_Change), y = Log_Fold_Change, fill = Type)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
+  coord_flip() +
+  labs(title = "Average Downregulated Log Fold Changes per Pathway",
+       x = "Pathway", 
+       y = "Average Log Fold Change",
+       fill = "Type") +
+  scale_fill_manual(values = c("avg_gene_lfc" = "steelblue", "avg_compound_lfc" = "darkorange"),
+                    labels = c("Gene Log Fold Change", "Compound Log Fold Change")) +
+  theme_minimal() +
+  theme(
+    text = element_text(size = 12),  # Adjust text size
+    axis.text.x = element_text(angle = 0, vjust = 0.5),  # Align x-axis text
+    axis.text.y = element_text(size = 10),  # Adjust y-axis text size
+    axis.title = element_text(size = 14, face = "bold"),  # Bold axis titles
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Center and bold plot title
+    legend.title = element_text(size = 12),  # Adjust legend title size
+    legend.text = element_text(size = 10),  # Adjust legend text size
+    panel.grid.major = element_line(color = "gray90"),  # Light grid lines
+    panel.grid.minor = element_blank()  # Remove minor grid lines
+  )
+
+# Save the plot
+ggsave(file.path(results_dir, "downregulated_pathways_log_fold_changes.pdf"), plot = p7, device = "pdf", width = 10, height = 8)
+
