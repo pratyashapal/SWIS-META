@@ -11,7 +11,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --ntasks-per-node=1
-#SBATCH --mail-user=2875659p@student.gla.ac.uk
+#SBATCH --mail-user=#add email id
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 
