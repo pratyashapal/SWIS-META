@@ -11,21 +11,21 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --ntasks-per-node=1
-#SBATCH --mail-user=2875659p@student.gla.ac.uk
+#SBATCH --mail-user=#email id
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 
 ###############################################
 # load modules
 
-module load apps/R/4.4.0/gcc-13.1.0+openblas-0.3.21
-#module load apps/fastqc/0.12.1/noarch
-#module load apps/trimmomatic/0.39/noarch
-#module load apps/python3/3.11.5/gcc-4.8.5
-#module load apps/multiqc/1.19
-module load apps/subread/2.0.6/gcc-4.8.5
-module load apps/samtools/1.18/gcc-4.8.5
-module load apps/hisat2/2.2.1/gcc-4.8.5
+# module load path/to/R
+# module load apps/fastqc/0.12.1/noarch
+# module load apps/trimmomatic/0.39/noarch
+# module load apps/python3/3.11.5/gcc-4.8.5
+# module load apps/multiqc/1.19
+# module load apps/subread/2.0.6/gcc-4.8.5
+# module load apps/samtools/1.18/gcc-4.8.5
+# module load apps/hisat2/2.2.1/gcc-4.8.5
 # Run snakemake
 snakemake -s snakefile_4 --cores $SLURM_CPUS_PER_TASK --use-conda
 
