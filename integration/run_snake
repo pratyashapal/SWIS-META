@@ -18,6 +18,6 @@
 ###############################################
 # load modules
 
-module load apps/R/4.4.0/gcc-13.1.0+openblas-0.3.21
-# Run snakemake
+# module load path/to/R
+# Run snakemake. 
 snakemake -s Snakefile --cores $SLURM_CPUS_PER_TASK --use-conda
