@@ -1,6 +1,12 @@
+# Name the Analysis
 ANALYSIS: # name
+
+# Choose yes if trimming is required
 TRIM: "yes" # or "no"
+
+# Choose yes if samples are xenografts
 XENO_FILTER: "yes" # or "no"
+
 ADAPTERS: "/path/to/adapters.fa"
 RAW_PATH: "/path/to/raw reads (fastq.gz)"
 TRIM_PATH: "/SWIS-META/transcriptomics/snake_out/trimmomatic"
