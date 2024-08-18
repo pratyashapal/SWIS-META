@@ -1,9 +1,9 @@
 import os
 
-# Define the configuration file
+# Defining the configuration file
 configfile: "/SWIS-META/metabolomics/config_main.yaml"
 
-# Define the directory for results
+# Defining the directory for results
 results_dir = config["results"]
 
 # Rule to execute the R script
