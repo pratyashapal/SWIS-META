@@ -1,15 +1,15 @@
-# Load required libraries
+# Loading required libraries
 library(MetaboAnalystR)
 library(OptiLCMS)
 library(yaml)
 
-# Define the path to the config file
+# Defining the path to the config file
 config_file <- "config/config_pre.yaml"
 
-# Read the configuration file
+# Reading the configuration file
 config <- yaml::read_yaml(config_file)
 
-# Extract input files
+# Extracting input files
 input_dirs <- config$input_dirs
 bm_pos <- list.files(input_dirs$bm_pos, full.names = TRUE)
 bm_neg <- list.files(input_dirs$bm_neg, full.names = TRUE)
@@ -18,10 +18,10 @@ brain_neg <- list.files(input_dirs$brain_neg, full.names = TRUE)
 qc_pos <- list.files(input_dirs$qc_pos, full.names = TRUE)
 qc_neg <- list.files(input_dirs$qc_neg, full.names = TRUE)
 
-# Combine all files
+# Combining all files
 all_files <- c(bm_pos, bm_neg, brain_pos, brain_neg, qc_pos, qc_neg)
 
-# Extract parameters
+# Extracting parameters
 roi_params <- config$roi_params
 rt_idx <- roi_params$rt_idx
 rm_conts <- roi_params$rm_conts
