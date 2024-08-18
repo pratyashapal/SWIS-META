@@ -1,7 +1,8 @@
+# Loading necessary libraries
 library(dplyr)
 library(yaml)
 
-# Load configuration
+# Loading configuration
 config <- yaml::read_yaml("/SWIS-META/metabolomics/config_main.yaml")
 
 output_dir <- file.path(config$results, config$mode)
@@ -9,11 +10,11 @@ setwd(output_dir)
 
 results_dir <- config$results
 
-# Define file paths for t-test results
+# Defining file paths for t-test results
 pos_ttest_file <- config$pos_ttest
 neg_ttest_file <- config$neg_ttest
 
-# Process t-test results
+# Processing t-test results
 pos <- read.csv(pos_ttest_file)
 neg <- read.csv(neg_ttest_file)
 
@@ -42,11 +43,11 @@ filtered_combined <- combined %>%
 
 write.csv(filtered_combined, file.path(results_dir, "filtered_combined.csv"), row.names = FALSE)
 
-# Define file paths for volcano results
+# Defining file paths for volcano results
 pos_volcano_file <- config$pos_volcano
 neg_volcano_file <- config$neg_volcano
 
-# Process volcano results
+# Processing volcano results
 pos_vol <- read.csv(pos_volcano_file)
 neg_vol <- read.csv(neg_volcano_file)
 
