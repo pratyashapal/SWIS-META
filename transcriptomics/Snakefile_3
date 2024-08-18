@@ -1,9 +1,9 @@
 import os
 
-# Load configuration
+# Loading configuration
 configfile: "config.yaml"
 
-# Define paths and parameters from config
+# Defining paths and parameters from config
 index_path = config["INDEX_PATH"]
 raw_path = config["RAW_PATH"]
 trim_path = config["TRIM_PATH"]
@@ -11,7 +11,7 @@ host_db = config["HOST_DB"]
 graft_db = config["GRAFT_DB"]
 xeno_dir = config["XENO_DIR"]
 
-# Get list of sample names from raw_path
+# List of sample names from raw_path
 samples = [os.path.basename(f).split('_R1_001.fastq.gz')[0] for f in os.listdir(raw_path) if f.endswith('_R1_001.fastq.gz')]
 
 # Rule to produce final output
