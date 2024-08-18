@@ -1,4 +1,4 @@
-# Load necessary packages
+# Loading necessary packages
 library(biomaRt)
 library(clusterProfiler)
 library(org.Hs.eg.db)
@@ -18,15 +18,15 @@ library(pheatmap)
 library(tidyr)
 library(yaml)
 
-# Read config file
+# Reading config file
 config <- yaml::read_yaml("/SWIS-META/metabolomics/config_main.yaml")
 results_dir <- config$results
 
-# Define file paths
+# Defining file paths
 filtered_combined_path <- file.path(results_dir, "filtered_combined.csv")
 filtered_combined_log_path <- file.path(results_dir, "filtered_combined_log.csv")
 
-# Load data
+# Loading data
 file <- read.csv(filtered_combined_path)
 file_log <- read.csv(filtered_combined_log_path, header = TRUE, stringsAsFactors = FALSE)
 
@@ -56,7 +56,7 @@ compound_pathway_df <- do.call(rbind, lapply(names(compound_pathways), function(
   data.frame(CompoundName = compound, PathwayID = compound_pathways[[compound]], stringsAsFactors = FALSE)
 }))
 
-# Merge compound data with pathway mappings
+# Merging compound data with pathway mappings
 compound_data_with_pathways <- merge(compound_data, compound_pathway_df, by.x = 'CompoundName', by.y = 'CompoundName')
 compound_data_with_pathways <- na.omit(compound_data_with_pathways)
 
@@ -77,20 +77,20 @@ get_pathway_names <- function(pathway_ids) {
   return(pathway_names)
 }
 
-# Retrieve common names for the pathways
+# Retrieving common names for the pathways
 pathway_names <- get_pathway_names(unique(compound_data_with_pathways$PathwayID))
 
-# Create a data frame for PathwayID and PathwayName
+# Creating a data frame for PathwayID and PathwayName
 pathway_names_df <- data.frame(
   PathwayID = names(pathway_names),
   PathwayName = pathway_names,
   stringsAsFactors = FALSE
 )
 
-# Merge with the original compound data
+# Merging with the original compound data
 compound_data_with_names <- merge(compound_data_with_pathways, pathway_names_df, by = "PathwayID", all.x = TRUE)
 
-# Calculate the average log fold change for each pathway
+# Calculating the average log fold change for each pathway
 pathway_avg_logFC <- compound_data_with_names %>%
   group_by(PathwayName) %>%
   summarise(avg_logFC = mean(LogFoldChange, na.rm = TRUE),
@@ -99,13 +99,6 @@ pathway_avg_logFC <- compound_data_with_names %>%
 # Separate pathways into upregulated and downregulated based on average log fold change
 pathway_avg_logFC <- pathway_avg_logFC %>%
   mutate(Direction = ifelse(avg_logFC > 0, "Upregulated", "Downregulated"))
-
-# Specify pathways to exclude
-excluded_pathways <- c("Autophagy - animal", "Autophagy - other", "Autophagy - yeast", "Ubiquinone and other terpenoid-quinone biosynthesis", "Tuberculosis", "Systemic lupus erythematosus", "Pathogenic Escherichia coli infection")
-
-# Filter out specified pathways
-pathway_avg_logFC <- pathway_avg_logFC %>%
-  filter(!PathwayName %in% excluded_pathways)
 
 # Filter top 10 upregulated and top 10 downregulated pathways
 top_upregulated <- pathway_avg_logFC %>%
@@ -144,7 +137,7 @@ top_20_pathways <- pathway_counts[order(pathway_counts$Count, decreasing = TRUE)
 top_20_pathways <- top_20_pathways[rev(seq_len(nrow(top_20_pathways))), ]
 
 # Set up plot margins to accommodate long names and shift y-axis label
-par(mar = c(7, 18, 4, 3) + 0.1)  # Increase left margin to fit long names and shift y-axis label
+par(mar = c(7, 18, 4, 3) + 0.1)  
 
 # Create the horizontal bar plot
 barplot(
@@ -154,14 +147,14 @@ barplot(
   col = "lightblue",
   main = "Number of Compounds per KEGG Pathway (Top 20)",
   xlab = "Number of Compounds",
-  ylab = "",            # Remove default y-axis label
-  cex.names = 0.7,      # Adjust text size for readability
-  las = 1,              # Rotate axis labels (1 for horizontal text)
-  cex.axis = 0.9        # Adjust axis text size for better fit
+  ylab = "",            
+  cex.names = 0.7,     
+  las = 1,             
+  cex.axis = 0.9       
 )
 mtext("Pathways", side = 2, line = 0.1, cex = 1)
 ggsave(filename = file.path(results_dir, "plots/top_20_pathways.pdf"), device = "pdf")
 
-# Save the compound-pathway mapping to CSV
+# Saving the compound-pathway mapping to CSV
 write.csv(compound_data_with_names, file.path(results_dir, "compound_pathway_with_names.csv"), row.names = FALSE)
 
