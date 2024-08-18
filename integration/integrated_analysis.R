@@ -1,4 +1,4 @@
-# Load necessary packages
+# Loading necessary packages
 library(org.Hs.eg.db)
 library(clusterProfiler)
 library(enrichplot)
@@ -18,54 +18,53 @@ library(igraph)
 library(ggraph)
 library(yaml)
 
-# Read config file
+# Reading config file
 config <- yaml::read_yaml("config.yaml")
 metabolomics_results_dir <- config$metabolomics_results_dir
 transcriptomics_results_dir <- config$transcriptomics_results_dir
 results_dir <- config$results_dir
 
-# Create the results directory if it doesn't exist
+# Creating the results directory if it doesn't exist
 if (!dir.exists(results_dir)) {
   dir.create(results_dir, recursive = TRUE)
 }
 
-# Define file paths
+# Defining file paths
 compound_pathway_file <- file.path(metabolomics_results_dir)
 gene_pathway_file <- file.path(transcriptomics_results_dir)
 
-# Read compound and gene data
+# Reading compound and gene data
 compound_data_with_names <- read.csv(compound_pathway_file, header = TRUE, stringsAsFactors = FALSE)
 gene_data <- read.csv(gene_pathway_file, header = TRUE, stringsAsFactors = FALSE)
 
-# Extract relevant columns
+# Extracting relevant columns
 
 gene_data <- gene_data[, c(1, 3)]
 colnames(gene_data) <- c("GeneSymbol", "LogFoldChange")
 
-# Map gene symbols to Entrez IDs using org.Hs.eg.db
+# Map[ing gene symbols to Entrez IDs using org.Hs.eg.db
 gene_data$EntrezID <- mapIds(org.Hs.eg.db, 
                              keys = gene_data$GeneSymbol, 
                              column = "ENTREZID", 
                              keytype = "SYMBOL", 
                              multiVals = "first")
 
-# Remove rows with missing Entrez IDs
+# Removing rows with missing Entrez IDs
 gene_data <- na.omit(gene_data)
 
-# Perform KEGG pathway enrichment analysis for genes
+# Perforingm KEGG pathway enrichment analysis for genes
 kegg_gene_enrichment <- enrichKEGG(gene = gene_data$EntrezID, 
                                    organism = 'hsa', 
                                    keyType = 'kegg', 
                                    pAdjustMethod = 'BH', 
                                    qvalueCutoff = 0.05)
 
-# Extract pathways from KEGG enrichment results
+# Extracting pathways from KEGG enrichment results
 pathway_data <- as.data.frame(kegg_gene_enrichment@result)
 
-# Filter to include only pathways related to "Metabolism" and "Environmental Information Processing"
+# Filter to include only pathways related to "Metabolism"
 filtered_pathways <- pathway_data %>%
-  filter(grepl("Metabolism", category, ignore.case = TRUE) | 
-           grepl("Environmental Information Processing", category, ignore.case = TRUE))
+  filter(grepl("Metabolism", category, ignore.case = TRUE)) 
 
 # Split geneID into separate rows
 gene_pathway_df <- filtered_pathways %>%
@@ -208,15 +207,15 @@ p6 <- ggplot(combined_upregulated_pathways_long, aes(x = reorder(PathwayName, Lo
                     labels = c("Gene Log Fold Change", "Compound Log Fold Change")) +
   theme_minimal() +
   theme(
-    text = element_text(size = 12),  # Adjust text size
-    axis.text.x = element_text(angle = 0, vjust = 0.5),  # Align x-axis text
-    axis.text.y = element_text(size = 10),  # Adjust y-axis text size
-    axis.title = element_text(size = 14, face = "bold"),  # Bold axis titles
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Center and bold plot title
-    legend.title = element_text(size = 12),  # Adjust legend title size
-    legend.text = element_text(size = 10),  # Adjust legend text size
-    panel.grid.major = element_line(color = "gray90"),  # Light grid lines
-    panel.grid.minor = element_blank()  # Remove minor grid lines
+    text = element_text(size = 12),  
+    axis.text.x = element_text(angle = 0, vjust = 0.5),  
+    axis.text.y = element_text(size = 10),  
+    axis.title = element_text(size = 14, face = "bold"),  
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5), 
+    legend.title = element_text(size = 12), 
+    legend.text = element_text(size = 10), 
+    panel.grid.major = element_line(color = "gray90"),  
+    panel.grid.minor = element_blank()  
   )
 
 # Save the plot
@@ -240,15 +239,15 @@ p7 <- ggplot(combined_downregulated_pathways_long, aes(x = reorder(PathwayName, 
                     labels = c("Gene Log Fold Change", "Compound Log Fold Change")) +
   theme_minimal() +
   theme(
-    text = element_text(size = 12),  # Adjust text size
-    axis.text.x = element_text(angle = 0, vjust = 0.5),  # Align x-axis text
-    axis.text.y = element_text(size = 10),  # Adjust y-axis text size
-    axis.title = element_text(size = 14, face = "bold"),  # Bold axis titles
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Center and bold plot title
-    legend.title = element_text(size = 12),  # Adjust legend title size
-    legend.text = element_text(size = 10),  # Adjust legend text size
-    panel.grid.major = element_line(color = "gray90"),  # Light grid lines
-    panel.grid.minor = element_blank()  # Remove minor grid lines
+    text = element_text(size = 12), 
+    axis.text.x = element_text(angle = 0, vjust = 0.5),  
+    axis.text.y = element_text(size = 10),  
+    axis.title = element_text(size = 14, face = "bold"),  
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  
+    legend.title = element_text(size = 12), 
+    legend.text = element_text(size = 10), 
+    panel.grid.major = element_line(color = "gray90"),  
+    panel.grid.minor = element_blank() 
   )
 
 # Save the plot
