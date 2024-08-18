@@ -1,13 +1,13 @@
 import os
 
-# Read config file
+# Reading config file
 configfile: "/SWIS-META/metabolomics/config_main.yaml"
 
-# Define the output directory and CSV paths based on ionization mode
+# Defining the output directory and CSV paths based on ionization mode
 mode = config["mode"]
 results_dir = config["results"]
 
-# Determine ionization-specific directory
+# Determining ionization-specific directory
 if mode == "positive":
     ionization_dir = os.path.join(results_dir, "positive")
     input_csv = config["input_csv_positive"]
@@ -19,10 +19,10 @@ elif mode == "negative":
 else:
     raise ValueError(f"Unknown ionization mode: {mode}")
 
-# Ensure the ionization directory exists without nesting directories
+# Ensuring the ionization directory exists without nesting directories
 os.makedirs(ionization_dir, exist_ok=True)
 
-# Define the output file path
+# Defining the output file path
 output_filtered_csv = os.path.join(ionization_dir, f"{config['output_prefix']}.{config['output_format']}")
 
 rule all:
