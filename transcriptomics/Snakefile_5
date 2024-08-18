@@ -1,7 +1,7 @@
-# Define the configuration file
+# Defining the configuration file
 configfile: "config.yaml"
 
-# Define the rule to run the R script
+# Defining the rule to run the R script
 rule all:
     input:
         expand("{output_dir}/pca_plot.pdf", output_dir=config["output_dir"]),
