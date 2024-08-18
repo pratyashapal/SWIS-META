@@ -26,6 +26,6 @@
 # module load apps/subread/2.0.6/gcc-4.8.5
 # module load apps/samtools/1.18/gcc-4.8.5
 # module load apps/hisat2/2.2.1/gcc-4.8.5
-# Run snakemake
-snakemake -s snakefile_4 --cores $SLURM_CPUS_PER_TASK --use-conda
+# Run snakemake by updating the required Snakefile
+snakemake -s Snakefile_1 --cores $SLURM_CPUS_PER_TASK --use-conda
 
