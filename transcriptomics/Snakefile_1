@@ -1,20 +1,20 @@
 import os
 
-# Specify the path for configuration file
+# Specifying the path for configuration file
 configfile: "/SWIS-META/transcriptomics/config.yaml"
 
-# Load configuration parameters
+# Loading configuration parameters
 raw_path = config["RAW_PATH"]
 
-# Automatically define and create output directories
+# Automatically defining and creating output directories
 out_path = "output"
 final_path = "output_final"
 
-# Create directories if they don't exist
+# Creating directories if they don't exist
 os.makedirs(out_path, exist_ok=True)
 os.makedirs(final_path, exist_ok=True)
 
-# Define subdirectory for pre-FastQC results
+# Defining subdirectory for pre-FastQC results
 pre_fastqc_dir = os.path.join(out_path, "preFASTQC")
 os.makedirs(pre_fastqc_dir, exist_ok=True)
 
