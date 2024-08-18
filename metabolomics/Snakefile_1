@@ -1,9 +1,9 @@
 import os
 
-# Read config file
+# Reading config file
 configfile: "/SWIS-META/metabolomics/config_1.yaml"
 
-# Define the output directory based on ionization mode
+# Defining the output directory based on ionization mode
 mode = config["mode"]
 if mode == "positive":
     ionization_dir = os.path.join(config["results"], "positive")
@@ -12,7 +12,7 @@ elif mode == "negative":
 else:
     raise ValueError(f"Unknown ionization mode: {mode}")
 
-# Create directories if they do not exist
+# Creating directories if they do not exist
 if not os.path.exists(config["results"]):
     os.makedirs(config["results"])
 
