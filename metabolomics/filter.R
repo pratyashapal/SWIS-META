@@ -1,17 +1,18 @@
+# Loading necessary libraries
 library(KEGGREST)
 library(dplyr)
 library(yaml)
 
-# Load parameters from config file
+# Loading parameters from config file
 config <- yaml::read_yaml("/SWIS-META/metabolomics/config_2.yaml")
 
-# Determine the output directory based on ionization mode
+# Determining the output directory based on ionization mode
 output_dir <- file.path(config$results, config$mode)
 
-# Set the working directory to the output directory
+# Setting the working directory to the output directory
 setwd(output_dir)
 
-# Read the input files
+# Reading the input files
 if (config$mode == "positive") {
   input_csv <- file.path(config$input_csv_positive)
   peaks_csv <- file.path(config$pos_peaks_csv)
@@ -25,7 +26,7 @@ if (config$mode == "positive") {
 data <- read.csv(input_csv, header = TRUE)
 peak_table <- read.csv(peaks_csv)
 
-# Define a function to get the compound name for a given KEGG ID
+# Defining a function to get the compound name for a given KEGG ID
 get_compound_name <- function(kegg_id) {
   compound_info <- tryCatch({
     keggGet(kegg_id)
@@ -40,20 +41,20 @@ get_compound_name <- function(kegg_id) {
   }
 }
 
-# Extract KEGG IDs from the specified column and clean them
+# Extracting KEGG IDs from the specified column and clean them
 kegg_ids <- trimws(as.character(data[[config$column_index]]))
 
-# Apply the function to the list of KEGG IDs
+# Applying the function to the list of KEGG IDs
 compound_names <- sapply(kegg_ids, get_compound_name)
 
-# Add the compound names to the original data frame
+# Adding the compound names to the original data frame
 data$Compound_Name <- compound_names
 
-# Remove rows with NA in Compound_Name
+# Removing rows with NA in Compound_Name
 data <- data %>%
   filter(!is.na(Compound_Name))
 
-# Process peak_table
+# Processing peak_table
 peak_table <- peak_table[-1,]
 split_column <- strsplit(as.character(peak_table$Sample), "__")
 peak_table$Query.Mass <- sapply(split_column, function(x) x[1])
@@ -61,15 +62,15 @@ peak_table$Retention.Time <- sapply(split_column, function(x) x[2])
 peak_table$Query.Mass <- as.numeric(peak_table$Query.Mass)
 peak_table$Retention.Time <- as.numeric(peak_table$Retention.Time)
 
-# Process compound_table
+# Processing compound_table
 data$Query.Mass <- as.numeric(data$Query.Mass)
 data$Retention.Time <- as.numeric(data$Retention.Time)
 
-# Merge the tables
+# Merging the tables
 merged_table <- data %>%
   left_join(peak_table, by = c("Retention.Time", "Query.Mass"))
 
-# Select specific columns
+# Selecting specific columns
 selected_columns <- merged_table[, c(7, 9:16)]
 
 # Write the filtered table to a CSV file in the output directory
