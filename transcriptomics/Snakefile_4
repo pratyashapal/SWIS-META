@@ -2,7 +2,7 @@ import os
 
 configfile: "config.yaml"
 
-# Define paths from the config file
+# Defining paths from the config file
 
 raw_path = config["RAW_PATH"]
 trim_path = config["TRIM_PATH"]
@@ -15,7 +15,7 @@ index_path = config["INDEX"]
 gtf_file = config["GTF_FILE"]
 
 
-# Ensure output directory exists
+# Ensuring output directory exists
 os.makedirs(output_path, exist_ok=True)
 
 # List of sample names
