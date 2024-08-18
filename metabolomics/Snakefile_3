@@ -1,9 +1,9 @@
 import os
 
-# Read config file
+# Reading config file
 configfile: "/SWIS-META/metabolomics/config_main.yaml"
 
-# Define results directory and input paths based on ionization mode
+# Defining results directory and input paths based on ionization mode
 results_dir = config["results"]
 mode = config["mode"]
 
@@ -16,10 +16,10 @@ elif mode == "negative":
 else:
     raise ValueError(f"Unknown ionization mode: {mode}")
 
-# Ensure the directories exist
+# Ensuring the directories exist
 os.makedirs(ionization_dir, exist_ok=True)
 
-# Define all output files
+# Defining all output files
 rule all:
     input:
         expand(f"{ionization_dir}/pca_scree_0_.png"),
