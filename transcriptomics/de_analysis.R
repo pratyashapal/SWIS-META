@@ -1,4 +1,4 @@
-# Load required libraries
+# Loading required libraries
 library(edgeR)
 library(limma)
 library(fgsea)
@@ -14,35 +14,34 @@ library(cowplot)
 library(ggrepel)
 library(DOSE)
 library(tibble)
-library(yaml)  # For reading YAML files
+library(yaml)  
 
-# Load configuration file
+# Loading configuration file
 config <- yaml.load_file("config_test2.yaml")
 
-# Load the count matrix and metadata from config paths
+# Loading the count matrix and metadata from config paths
 count_matrix <- read.csv(config$count_matrix_path, row.names = 1, header = TRUE)
 meta_data <- read.csv(config$metadata_path, header = TRUE)
-meta_data = meta_data[-c(9,10),]
 rownames(meta_data) = meta_data$sample
 
-# Create DESeq2 object
+# Creating DESeq2 object
 dds <- DESeqDataSetFromMatrix(countData = count_matrix, colData = meta_data, design = ~ condition)
 dds <- estimateSizeFactors(dds)
 dds <- DESeq(dds)
 
-# Access normalized counts, if needed
+# Accessing normalized counts, if needed
 normalized_counts <- counts(dds, normalized = TRUE)
 log_norm_counts <- log2(normalized_counts + 1)
 pca_res <- prcomp(t(log_norm_counts))
 
-# Create a data frame for plotting
+# Creating a data frame for plotting
 pca_data <- data.frame(Sample = rownames(pca_res$x),
                        PC1 = pca_res$x[,1],
                        PC2 = pca_res$x[,2],
                        Condition = meta_data$condition[rownames(pca_res$x)])
 pca_data$Condition <- meta_data[match(pca_data$Sample, rownames(meta_data)), "condition"]
 
-# Create the PCA plot with bold sample labels
+# Creating the PCA plot with bold sample labels
 pca_log_norm_counts <- ggplot(pca_data, aes(x = PC1, y = PC2, color = Condition, label = Sample)) +
   geom_point(size = 3) +
   geom_text_repel(size = 3) + 
