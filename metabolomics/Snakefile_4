@@ -1,9 +1,9 @@
 import os
 
-# Read the configuration file
+# Reading the configuration file
 configfile: "/SWIS-META/metabolomics/config_main.yaml"
 
-# Define results directory
+# Defining results directory
 results_dir = config["results"]
 
 rule all:
