@@ -11,6 +11,7 @@ Navigate to the Repository Directory:
 cd SWIS-META
 
 Create and Activate the Conda Environment:
+
 conda env create -f environment.yml
 
 
