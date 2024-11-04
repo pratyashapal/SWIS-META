@@ -12,6 +12,8 @@ cd SWIS-META
 
 Create and Activate the Conda Environment:
 conda env create -f environment.yml
+
+
 conda activate swis-meta
 
 This setup creates a dedicated Conda environment with all necessary dependencies for running SWIS-META. Ensure that you have the latest R packages and MetaboAnalyst installed separately for compatibility.
