@@ -104,4 +104,4 @@ dependencies:
       - urllib3==2.2.2
       - wrapt==1.16.0
       - yte==1.5.4
-prefix: /users/2875659p/.conda/envs/myenv
+prefix: /users/2875659p/.conda/envs/swis-meta
