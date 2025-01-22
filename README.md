@@ -1,4 +1,6 @@
 # SWIS-META
+Snakemake Workflow for Integrated Study of MEtabolomics and Transcriptomics Analysis
+
 SWIS-META is a comprehensive analysis pipeline designed for integrating transcriptomic and metabolomic data using Snakemake. This document provides detailed instructions for installation, setup, and execution of the SWIS-META pipeline.
 
 Installation and Setup
